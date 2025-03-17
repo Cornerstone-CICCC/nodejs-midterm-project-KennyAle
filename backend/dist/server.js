@@ -7,6 +7,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const cookie_session_1 = __importDefault(require("cookie-session"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
+const recipe_routes_1 = __importDefault(require("./routes/recipe.routes"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -26,6 +27,7 @@ app.use((0, cookie_session_1.default)({
 }));
 app.use(express_1.default.json());
 app.use('/users', user_routes_1.default);
+app.use('/recipes', recipe_routes_1.default);
 app.use((req, res) => {
     res.status(404).send('Page not found!');
 });

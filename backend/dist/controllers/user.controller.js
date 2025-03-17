@@ -13,13 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const user_model_1 = __importDefault(require("../models/user.model"));
-/**
- * Find user by username
- *
- * @param {Request} req
- * @param {Response} res
- * @returns {void} Checks for username in cookie session and returns user object.
- */
 const getUserByUsername = (req, res) => {
     if (req.session && req.session.username) {
         const user = user_model_1.default.findByUsername(req.session.username);
@@ -32,13 +25,6 @@ const getUserByUsername = (req, res) => {
     }
     res.status(403).json({ message: "Forbidden" });
 };
-/**
- * Create new user
- *
- * @param {Request<{}, {}, Omit<User, 'id'>>} req
- * @param {Response} res
- * @returns {void} Adds user and returns success message.
- */
 const addUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password, firstname, lastname } = req.body;
     if (!username || !password) {
@@ -57,13 +43,6 @@ const addUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     res.status(201).json({ message: "User created successfully!" });
 });
-/**
- * Logs in user
- *
- * @param {Request<{}, {}, Omit<User, 'id'>>} req
- * @param {Response} res
- * @returns {void} Checks username and password and set session cookie.
- */
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { username, password } = req.body;
     const user = yield user_model_1.default.login(username, password);
@@ -77,13 +56,6 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
     res.status(200).json(user);
 });
-/**
- * Logs out user
- *
- * @param {Request} req
- * @param {Response} res
- * @returns {void} Clears session cookie.
- */
 const logoutUser = (req, res) => {
     req.session = null;
     res.status(200).json({ message: "Logged out successfully!" });

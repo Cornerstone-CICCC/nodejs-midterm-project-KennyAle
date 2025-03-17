@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express'
 import cors from 'cors'
 import cookieSession from 'cookie-session'
 import userRouter from './routes/user.routes'
+import recipeRouter from './routes/recipe.routes'
 import dotenv from 'dotenv'
 dotenv.config()
 
@@ -24,6 +25,7 @@ app.use(cookieSession({
 app.use(express.json())
 
 app.use('/users', userRouter)
+app.use('/recipes', recipeRouter)
 
 app.use((req: Request, res: Response) => {
   res.status(404).send('Page not found!')
