@@ -4,8 +4,8 @@ export interface Recipe {
     thumbnail: string,
     ingredients: Ingredient[],
     instructions: string,
-    category: string
-    area: string,
+    category: string,
+    area: string
 }
 
 interface Ingredient {

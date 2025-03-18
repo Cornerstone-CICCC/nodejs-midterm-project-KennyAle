@@ -7,15 +7,27 @@ const express_1 = require("express");
 const recipe_controller_1 = __importDefault(require("../controllers/recipe.controller"));
 const recipeRouter = (0, express_1.Router)();
 // Browse
-recipeRouter.get('recipes', recipe_controller_1.default.getRecipes);
-// Read
-recipeRouter.get('recipes/id', recipe_controller_1.default.getRecipeById);
+recipeRouter.get('/', recipe_controller_1.default.getRecipes);
 // Search
-recipeRouter.get('recipes/search?q=keyword', recipe_controller_1.default.searchRecipe);
+recipeRouter.get('/search', recipe_controller_1.default.searchRecipe);
+// Read
+recipeRouter.get('/:id', recipe_controller_1.default.getRecipeById);
 // Edit
-recipeRouter.put('recipes/id', recipe_controller_1.default.editRecipe);
+recipeRouter.put('/:id', recipe_controller_1.default.editRecipe);
 // Add
-recipeRouter.post('recipes', recipe_controller_1.default.addRecipe);
+recipeRouter.post('/', recipe_controller_1.default.addRecipe);
 // Delete
-recipeRouter.delete('recipes/id', recipe_controller_1.default.deleteRecipe);
+recipeRouter.delete('/:id', recipe_controller_1.default.deleteRecipe);
+// // Browse
+// recipeRouter.get('/', checkLoggedIn, recipeController.getRecipes)
+// // Search
+// recipeRouter.get('/search', checkLoggedIn, recipeController.searchRecipe)
+// // Read
+// recipeRouter.get('/:id', checkLoggedIn, recipeController.getRecipeById)
+// // Edit
+// recipeRouter.put('/:id', checkLoggedIn, recipeController.editRecipe)
+// // Add
+// recipeRouter.post('/', checkLoggedIn, recipeController.addRecipe)
+// // Delete
+// recipeRouter.delete('/:id', checkLoggedIn, recipeController.deleteRecipe)
 exports.default = recipeRouter;

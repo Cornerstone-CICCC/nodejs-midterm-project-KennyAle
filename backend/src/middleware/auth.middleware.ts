@@ -5,5 +5,5 @@ export const checkLoggedIn = async (req: Request, res: Response, next: NextFunct
     next()
     return
   }
-  res.status(403).json({ message: "You are not allowed to access this resource!" })
+  res.status(403).json({ message: "You need to be logged in!" })
 }

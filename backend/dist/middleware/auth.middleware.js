@@ -15,6 +15,6 @@ const checkLoggedIn = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         next();
         return;
     }
-    res.status(403).json({ message: "You are not allowed to access this resource!" });
+    res.status(403).json({ message: "You need to be logged in!" });
 });
 exports.checkLoggedIn = checkLoggedIn;
