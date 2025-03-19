@@ -58,7 +58,6 @@ class RecipeModel {
         if (foundRecipe === -1) return false
         this.recipes.splice(foundRecipe, 1)
     }
-
 }
 
 export default new RecipeModel
