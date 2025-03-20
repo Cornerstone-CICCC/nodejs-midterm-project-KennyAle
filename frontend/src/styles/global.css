@@ -1,1 +1,10 @@
+@import url("https://fonts.googleapis.com/css2?family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap");
 @import "tailwindcss";
+
+@theme {
+    --font-display: "Work Sans", "sans-serif";
+}
+
+.login-bg {
+    background-image: linear-gradient(to right top, #ffffff, #fafbff, #f4f7ff, #edf3ff, #e4f0ff);
+}

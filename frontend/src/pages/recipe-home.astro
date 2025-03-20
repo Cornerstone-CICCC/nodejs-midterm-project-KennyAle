@@ -1,0 +1,85 @@
+---
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
+import AddRecipe from "../components/AddRecipe.astro";
+---
+
+<Layout>
+  <main class="font-display">
+    <div class="container mx-[auto] w-11/12">
+      <div class="header flex justify-between items-center">
+        <h2 class="opacity-50 font-semibold">Hi!, Kenny</h2>
+        <div class="header-btns flex">
+          <img
+            class="rounded-full p-2 shadow-[0px_0px_3px_0px_rgba(0,_0,_0,_0.1)]"
+            src="https://placehold.co/30x30"
+            alt=""
+          />
+          <img
+            class="rounded-full p-2 shadow-[0px_0px_3px_0px_rgba(0,_0,_0,_0.1)]"
+            src="https://placehold.co/30x30"
+            alt=""
+          />
+        </div>
+      </div>
+      <div class="home-body">
+        <h1 class="text-3xl font-bold w-3/4">What's On Your Plate Today?</h1>
+        <form
+          method="get"
+          class="w-full flex bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl pl-4 focus:ring-blue-500 focus:border-blue-500 p-2"
+        >
+          <input
+            class="w-full"
+            type="text"
+            placeholder="Describe what you're craving..."
+          />
+          <input
+            class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-non font-medium rounded-xl text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700"
+            type="submit"
+            value="Search"
+          />
+        </form>
+        <h2 class="py-3">Your Recipes</h2>
+        <div class="overflow-x-scroll recipe-list rounded-md flex gap-5 p-1">
+          <div class="min-w-[280px] w-[280px] recipe flex flex-col gap-2 p-5 rounded-md outline-1">
+            <img class="w-full" src="https://placehold.co/150x100" alt="" />
+            <h3>Spice Grilled Chicken With Avocado Salsa</h3>
+            <div class="recipe-tags">
+                <span class="category">Category</span>
+                <span class="area">Area</span>
+            </div>
+            <div class="recipe-list-btns flex gap-2">
+                <button class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:outline-non text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2">Cook Now</button>
+                <button class="bg-gray-200 border border-gray-300 hover:bg-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2">Add to List</button>
+            </div>
+          </div>
+          <div class="min-w-[280px] w-[280px] recipe flex flex-col gap-2 p-5 rounded-md outline-1">
+            <img class="w-full" src="https://placehold.co/150x100" alt="" />
+            <h3>Spice Grilled Chicken With Avocado Salsa</h3>
+            <div class="recipe-tags">
+                <span class="category">Category</span>
+                <span class="area">Area</span>
+            </div>
+            <div class="recipe-list-btns flex gap-2">
+                <button class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:outline-non text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2">Cook Now</button>
+                <button class="bg-gray-200 border border-gray-300 hover:bg-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2">Add to List</button>
+            </div>
+          </div>
+          <div class="min-w-[280px] w-[280px] recipe flex flex-col gap-2 p-5 rounded-md outline-1">
+            <img class="w-full" src="https://placehold.co/150x100" alt="" />
+            <h3>Spice Grilled Chicken With Avocado Salsa</h3>
+            <div class="recipe-tags">
+                <span class="category">Category</span>
+                <span class="area">Area</span>
+            </div>
+            <div class="recipe-list-btns flex gap-2">
+                <button class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:outline-non text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2">Cook Now</button>
+                <button class="bg-gray-200 border border-gray-300 hover:bg-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2">Add to List</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <AddRecipe/>
+</Layout>

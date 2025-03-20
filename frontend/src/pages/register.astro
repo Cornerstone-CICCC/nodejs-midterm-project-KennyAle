@@ -4,48 +4,108 @@ import "../styles/global.css";
 ---
 
 <Layout>
-  <h1>Create Account</h1>
-  <form id="form-signup">
-    <label>
-      Username:
-      <input type="text" name="username" placeholder="Enter username" required />
-    </label>
-    <label>
-      Password:
-      <input type="password" name="password" placeholder="Enter password" required />
-    </label>
-    <label>
-      First Name:
-      <input type="text" name="firstname" placeholder="Enter first name" required />
-    </label>
-    <label>
-      Last Name:
-      <input type="text" name="lastname" placeholder="Enter last name" required />
-    </label>
-    <button>Sign Up</button>
-  </form>
+  <main class="login-bg">
+    <div
+      class="mx-[auto] mt-3 min-h-dvh w-11/12 flex flex-col items-center justify-around"
+    >
+      <h1 class="text-center text-xl font-bold">
+        Register to Unlock Delicious Recipes
+      </h1>
+      <form id="form-signup" class="w-full flex flex-col gap-5">
+        <label
+          for="username"
+          class="block mb-2 text-sm font-medium text-gray-900"
+          >Username:
+          <input
+            type="text"
+            name="username"
+            id="username"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+            placeholder="Enter your username"
+            autocomplete="off"
+            required
+          /></label
+        >
+        <label
+          for="password"
+          class="block mb-2 text-sm font-medium text-gray-900"
+          >Password:
+          <input
+            type="text"
+            name="password"
+            id="password"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+            placeholder="Enter your password"
+            autocomplete="off"
+            required
+          /></label
+        >
+        <div class="names flex gap-3">
+          <label
+            for="firstname"
+            class="block mb-2 text-sm font-medium text-gray-900"
+            >First Name:
+            <input
+              type="text"
+              name="firstname"
+              id="firstname"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+              placeholder="Enter your name"
+              autocomplete="off"
+              required
+            /></label
+          >
+          <label
+            for="lastname"
+            class="block mb-2 text-sm font-medium text-gray-900"
+            >Last Name:
+            <input
+              type="text"
+              name="lastname"
+              id="lastname"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+              placeholder="Enter your last name"
+              autocomplete="off"
+              required
+            /></label
+          >
+        </div>
+        <div class="sign-footer">
+          <button
+            class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:outline-non font-medium rounded-md text-sm px-5 py-2.5 text-center me-2 mt-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+            >Sign up</button
+          >
+          <p class="text-center">
+            Already have an account? <a href="/login" class="underline">Login</a
+            >
+          </p>
+        </div>
+      </form>
+      <main class="login-bg"></main>
+    </div>
+  </main>
 </Layout>
 
 <script>
-  const form = document.querySelector('#form-signup') as HTMLFormElement
+  const form = document.querySelector("#form-signup") as HTMLFormElement;
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    
-    const formData = new FormData(e.target as HTMLFormElement)
-    const formObj = Object.fromEntries(formData.entries()) // Converts form data to JS object
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const formObj = Object.fromEntries(formData.entries()); // Converts form data to JS object
     const res = await fetch(`http://localhost:4500/users/signup`, {
       method: "POST",
       credentials: "include",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(formObj)
-    })
+      body: JSON.stringify(formObj),
+    });
     if (!res.ok) {
-      console.error("Something went wrong")
-      return
+      console.error("Something went wrong");
+      return;
     }
-    window.location.href = "/login"
-  })
+    window.location.href = "/login";
+  });
 </script>

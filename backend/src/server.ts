@@ -9,7 +9,7 @@ dotenv.config()
 const app = express()
 
 app.use(cors({
-  origin: 'http://localhost:4321',
+  origin: 'http://localhost:4323',
   credentials: true
 }))
 const SIGN_KEY = process.env.COOKIE_SIGN_KEY

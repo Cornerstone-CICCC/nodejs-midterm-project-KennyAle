@@ -4,50 +4,75 @@ import "../styles/global.css";
 ---
 
 <Layout>
-  <h1>Log In</h1>
-  <form id="form-login">
-    <label for="email-address-icon" class="block mb-2 text-sm font-medium text-gray-900">Your Email</label>
-  <div class="relative">
-    <div class="absolute inset-y-0 start-0 flex items-center ps-3.5 pointer-events-none">
-      <svg class="w-4 h-4 text-gray-500" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 16">
-        <path d="m10.036 8.278 9.258-7.79A1.979 1.979 0 0 0 18 0H2A1.987 1.987 0 0 0 .641.541l9.395 7.737Z"/>
-        <path d="M11.241 9.817c-.36.275-.801.425-1.255.427-.428 0-.845-.138-1.187-.395L0 2.6V14a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V2.5l-8.759 7.317Z"/>
-      </svg>
+  <main class="login-bg">
+    <div
+      class="mx-[auto] min-h-dvh w-11/12 flex flex-col items-center justify-around"
+    >
+      <h1 class="text-center text-xl font-bold">
+        Welcome Back! Log in to Your Recipe Book
+      </h1>
+      <form id="form-login" class="w-full flex flex-col gap-5">
+        <label
+          for="username"
+          class="block mb-2 text-sm font-medium text-gray-900"
+          >Username:
+          <input
+            type="text"
+            name="username"
+            id="username"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+            placeholder="Enter your username"
+            autocomplete="off"
+            required
+          /></label
+        >
+        <label
+          for="password"
+          class="block mb-2 text-sm font-medium text-gray-900"
+          >Password:
+          <input
+            type="text"
+            name="password"
+            id="password"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+            placeholder="Enter your password"
+            autocomplete="off"
+            required
+          /></label
+        >
+        <button
+          class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:outline-non font-medium rounded-md text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          >Log In</button
+        >
+        <p class="text-center">
+          Don't have an account? <a href="/register" class="underline"
+            >Sign Up</a>
+        </p>
+      </form>
     </div>
-    <input type="text" id="email-address-icon" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full ps-10 p-2.5" placeholder="name@flowbite.com">
-  </div>
-    <label>
-      Username:
-      <input type="text" name="username" placeholder="Enter username" required />
-    </label>
-    <label>
-      Password:
-      <input type="password" name="password" placeholder="Enter password" required />
-    </label>
-    <button>Log In</button>
-  </form>
+  </main>
 </Layout>
 
 <script>
-  const form = document.querySelector('#form-login') as HTMLFormElement
+  const form = document.querySelector("#form-login") as HTMLFormElement;
 
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault()
-    
-    const formData = new FormData(e.target as HTMLFormElement)
-    const formObj = Object.fromEntries(formData.entries()) // Converts form data to JS object
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const formObj = Object.fromEntries(formData.entries()); // Converts form data to JS object
     const res = await fetch(`http://localhost:4500/users/login`, {
       method: "POST",
       credentials: "include",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(formObj)
-    })
+      body: JSON.stringify(formObj),
+    });
     if (!res.ok) {
-      console.error("Login details are incorrect")
-      return
+      console.error("Login details are incorrect");
+      return;
     }
-    window.location.href = "/profile"
-  })
+    window.location.href = "/profile";
+  });
 </script>
