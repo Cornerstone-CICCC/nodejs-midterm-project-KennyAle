@@ -5,6 +5,10 @@
     --font-display: "Work Sans", "sans-serif";
 }
 
+a, p, h1, h2, h3, h4, li {
+    cursor: default;
+}
+
 .login-bg {
     background-image: linear-gradient(to right top, #ffffff, #fafbff, #f4f7ff, #edf3ff, #e4f0ff);
 }
