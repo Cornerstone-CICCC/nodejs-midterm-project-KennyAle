@@ -32,22 +32,23 @@ import AddRecipe from "../components/AddRecipe.astro";
           class="w-full flex bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl pl-4 focus:ring-blue-500 focus:border-blue-500 p-2"
         >
           <input
-            class="w-full focus:outline-0"
+            class="w-full bg-gray-50 focus:outline-0"
             type="text"
             id="search-input"
+            autocomplete="off"
             placeholder="Describe what you're craving..."
           />
           <input
-            class="text-white bg-blue-700 hover:bg-blue-800 focus:outline-non font-medium rounded-xl text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700"
+            class="text-white hover:bg-blue-800 focus:outline-non font-medium rounded-xl text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700"
             type="submit"
             value="Search"
           />
         </form>
         <div
-          class="flex flex-col gap-3 recipe-text rounded-lg bg-white my-3"
+          class="hidden recipe-results flex-col gap-3 rounded-lg bg-white my-3"
         >
-          <h3 class="w-1/2">Recipes:</h3>
-          <ul class="flex flex-col gap-2">
+          <h3 class="w-1/2">Results:</h3>
+          <ul class="recipe-results-list flex flex-col gap-2">
             <li
               class="text-sm flex items-center gap-3 bg-gray-100 rounded-md px-3 py-1"
             >
@@ -56,70 +57,7 @@ import AddRecipe from "../components/AddRecipe.astro";
                 src="https://placehold.co/60x60"
                 alt=""
               />
-              <div class="recipe-list-text flex flex-col  mr-[auto] gap-1">
-                <p class="font-semibold">Fried Chicken</p>
-                <span class="flex gap-3">
-                  <p>Category</p>
-                  <p>Area</p>
-                </span>
-              </div>
-              <button
-                class="justify-self-end text-center w-1/4 text-blue-700 bg-white hover:bg-white focus:outline-non text-sm rounded-lg py-2"
-              >
-                See Recipe
-              </button>
-            </li>
-            <li
-              class="text-sm flex items-center gap-3 bg-gray-100 rounded-md px-3 py-1"
-            >
-              <img
-                class="py-2 rounded-xl"
-                src="https://placehold.co/60x60"
-                alt=""
-              />
-              <div class="recipe-list-text flex flex-col  mr-[auto] gap-1">
-                <p class="font-semibold">Fried Chicken</p>
-                <span class="flex gap-3">
-                  <p>Category</p>
-                  <p>Area</p>
-                </span>
-              </div>
-              <button
-                class="justify-self-end text-center w-1/4 text-blue-700 bg-white hover:bg-white focus:outline-non text-sm rounded-lg py-2"
-              >
-                See Recipe
-              </button>
-            </li>
-            <li
-              class="text-sm flex items-center gap-3 bg-gray-100 rounded-md px-3 py-1"
-            >
-              <img
-                class="py-2 rounded-xl"
-                src="https://placehold.co/60x60"
-                alt=""
-              />
-              <div class="recipe-list-text flex flex-col  mr-[auto] gap-1">
-                <p class="font-semibold">Fried Chicken</p>
-                <span class="flex gap-3">
-                  <p>Category</p>
-                  <p>Area</p>
-                </span>
-              </div>
-              <button
-                class="justify-self-end text-center w-1/4 text-blue-700 bg-white hover:bg-white focus:outline-non text-sm rounded-lg py-2"
-              >
-                See Recipe
-              </button>
-            </li>
-            <li
-              class="text-sm flex items-center gap-3 bg-gray-100 rounded-md px-3 py-1"
-            >
-              <img
-                class="py-2 rounded-xl"
-                src="https://placehold.co/60x60"
-                alt=""
-              />
-              <div class="recipe-list-text flex flex-col  mr-[auto] gap-1">
+              <div class="recipe-list-text flex flex-col mr-[auto] gap-1">
                 <p class="font-semibold">Fried Chicken</p>
                 <span class="flex gap-3">
                   <p>Category</p>
@@ -134,10 +72,10 @@ import AddRecipe from "../components/AddRecipe.astro";
             </li>
           </ul>
         </div>
-        <h2 class="py-3">Your Recipes</h2>
-        <div class="overflow-x-scroll recipe-list rounded-md flex gap-5 p-1">
+        <h2 class="py-3">Your Recipes:</h2>
+        <div class="recipe-user-list overflow-x-scroll rounded-md flex gap-5 p-1">
           <div
-            class="min-w-[280px] w-[280px] recipe flex flex-col gap-2 p-5 rounded-md outline-1"
+            class="recipe-user min-w-[280px] w-[280px] flex flex-col gap-2 p-5 rounded-md outline-1"
           >
             <img class="w-full" src="https://placehold.co/150x100" alt="" />
             <h3>Spice Grilled Chicken With Avocado Salsa</h3>
@@ -204,6 +142,8 @@ import AddRecipe from "../components/AddRecipe.astro";
 </Layout>
 
 <script>
+  import type Recipe from "./recipe.astro";
+
   const searchForm = document.getElementById(
     "search-recipe"
   ) as HTMLFormElement;
@@ -213,13 +153,52 @@ import AddRecipe from "../components/AddRecipe.astro";
       "search-input"
     ) as HTMLInputElement;
     const query = searchInput.value;
-    mealDbRecipes(query);
+    renderSearch(query);
   });
-  const mealDbRecipes = async (query: string) => {
+
+  const renderSearch = async (query: string) => {
     const res = await fetch(
       `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`
     );
     const data = await res.json();
     console.log(data);
+    const searchContainer = document.querySelector(
+      ".recipe-results"
+    ) as HTMLDivElement;
+    const listContainer = searchContainer.querySelector(
+      ".recipe-results-list"
+    ) as HTMLUListElement;
+    listContainer.innerHTML = "";
+    searchContainer.classList.remove("hidden");
+    searchContainer.classList.add("flex");
+    data.meals.forEach((recipe: any) => {
+      const listItem = document.createElement("li");
+      listItem.innerHTML = `
+      <li
+              class="text-sm flex items-center gap-3 bg-gray-100 rounded-md px-3 py-1"
+            >
+              <img
+                class="object-cover py-2 rounded-xl w-[60px] h-[60px]"
+                src="${recipe.strMealThumb}"
+                alt=""
+              />
+              <div class="recipe-list-text flex flex-col mr-[auto] gap-1">
+                <p class="font-semibold">${recipe.strMeal}</p>
+                <span class="flex gap-3">
+                  <p>${recipe.strArea}</p>
+                  <span>-</span>
+                  <p>${recipe.strCategory}</p>
+                </span>
+              </div>
+              <a href="${recipe.idMeal}"
+                class="justify-self-end text-center w-1/4 text-blue-700 bg-white hover:bg-white focus:outline-non text-sm rounded-lg py-2"
+              >
+                See Recipe
+              </a>
+            </li>
+      `;
+      listContainer.appendChild(listItem);
+      console.log(recipe);
+    });
   };
 </script>

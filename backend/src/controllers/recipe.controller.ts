@@ -1,6 +1,20 @@
 import { Request, Response } from "express";
 import { Recipe } from "../types/recipe";
 import recipeModel from "../models/recipe.model";
+import multer, { StorageEngine } from "multer";
+import { v4 as uuidv4 } from 'uuid'
+
+const storage: StorageEngine = multer.diskStorage({
+    destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+        cb(null, "src/uploads/");
+    },
+    filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+        cb(null, uuidv4() + "-" + file.originalname); 
+    }
+});
+
+const upload = multer({ storage });
+
 
 const getRecipes = (req: Request, res: Response) => {
     const recipes = recipeModel.browseRecipes()
@@ -42,7 +56,8 @@ const editRecipe = (req: Request<{ id: string }, {}, Partial<Recipe>>, res: Resp
 }
 
 const addRecipe = (req: Request<{}, {}, Omit<Recipe, 'id'>>, res: Response) => {
-    const { name, thumbnail, ingredients, instructions, category, area } = req.body
+    const { name, ingredients, instructions, category, area } = req.body
+    const thumbnail = req.file ? `/uploads/${req.file.filename}` : null;
     if (!name || !thumbnail || !ingredients || !instructions || !category || !area) {
         res.status(500).json({ message: 'Missing information' })
         return
@@ -66,6 +81,6 @@ export default {
     getRecipeById,
     searchRecipe,
     editRecipe,
-    addRecipe,
+    addRecipe: [upload.single("thumbnail"), addRecipe],
     deleteRecipe
 }

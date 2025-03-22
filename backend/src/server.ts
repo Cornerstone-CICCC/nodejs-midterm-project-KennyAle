@@ -8,6 +8,7 @@ dotenv.config()
 
 const app = express()
 
+app.use("src/uploads", express.static("uploads"))
 app.use(cors({
   origin: 'http://localhost:4321',
   credentials: true

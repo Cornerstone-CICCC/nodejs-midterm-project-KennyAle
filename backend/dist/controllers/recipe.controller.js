@@ -4,6 +4,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const recipe_model_1 = __importDefault(require("../models/recipe.model"));
+const multer_1 = __importDefault(require("multer"));
+const uuid_1 = require("uuid");
+const storage = multer_1.default.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "src/uploads/");
+    },
+    filename: (req, file, cb) => {
+        cb(null, (0, uuid_1.v4)() + "-" + file.originalname);
+    }
+});
+const upload = (0, multer_1.default)({ storage });
 const getRecipes = (req, res) => {
     const recipes = recipe_model_1.default.browseRecipes();
     if (!recipes) {
@@ -40,7 +51,8 @@ const editRecipe = (req, res) => {
     res.status(200).json(recipe);
 };
 const addRecipe = (req, res) => {
-    const { name, thumbnail, ingredients, instructions, category, area } = req.body;
+    const { name, ingredients, instructions, category, area } = req.body;
+    const thumbnail = req.file ? `/uploads/${req.file.filename}` : null;
     if (!name || !thumbnail || !ingredients || !instructions || !category || !area) {
         res.status(500).json({ message: 'Missing information' });
         return;
@@ -62,6 +74,6 @@ exports.default = {
     getRecipeById,
     searchRecipe,
     editRecipe,
-    addRecipe,
+    addRecipe: [upload.single("thumbnail"), addRecipe],
     deleteRecipe
 };

@@ -11,6 +11,7 @@ const recipe_routes_1 = __importDefault(require("./routes/recipe.routes"));
 const dotenv_1 = __importDefault(require("dotenv"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
+app.use("src/uploads", express_1.default.static("uploads"));
 app.use((0, cors_1.default)({
     origin: 'http://localhost:4321',
     credentials: true
