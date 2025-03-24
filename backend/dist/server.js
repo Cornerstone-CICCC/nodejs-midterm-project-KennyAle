@@ -9,9 +9,10 @@ const cookie_session_1 = __importDefault(require("cookie-session"));
 const user_routes_1 = __importDefault(require("./routes/user.routes"));
 const recipe_routes_1 = __importDefault(require("./routes/recipe.routes"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const path_1 = __importDefault(require("path"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
-app.use("src/uploads", express_1.default.static("uploads"));
+app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../uploads")));
 app.use((0, cors_1.default)({
     origin: 'http://localhost:4321',
     credentials: true

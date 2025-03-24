@@ -8,7 +8,7 @@ const multer_1 = __importDefault(require("multer"));
 const uuid_1 = require("uuid");
 const storage = multer_1.default.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, "src/uploads/");
+        cb(null, "uploads/");
     },
     filename: (req, file, cb) => {
         cb(null, (0, uuid_1.v4)() + "-" + file.originalname);
@@ -42,13 +42,37 @@ const searchRecipe = (req, res) => {
 };
 const editRecipe = (req, res) => {
     const { id } = req.params;
-    const { name, thumbnail, ingredients, instructions, category, area } = req.body;
-    const recipe = recipe_model_1.default.editRecipe(id, { name, thumbnail, ingredients, instructions, category, area });
-    if (!recipe) {
-        res.status(404).json({ message: 'Recipe not found' });
-        return;
+    const { name, ingredients, instructions, category, area } = req.body;
+    const existingRecipe = recipe_model_1.default.readRecipe(id);
+    if (!existingRecipe) {
+        return res.status(404).json({ message: "Recipe not found" });
     }
-    res.status(200).json(recipe);
+    let thumbnail = existingRecipe.thumbnail;
+    if (req.file) {
+        const fs = require("fs");
+        const path = require("path");
+        if (existingRecipe.thumbnail) {
+            const oldImagePath = path.join(__dirname, "..", existingRecipe.thumbnail);
+            fs.unlink(oldImagePath, (err) => {
+                if (err && err.code !== "ENOENT") {
+                    console.error("Error deleting old image:", err);
+                }
+            });
+        }
+        thumbnail = `/uploads/${req.file.filename}`;
+    }
+    const updatedRecipe = recipe_model_1.default.editRecipe(id, {
+        name,
+        thumbnail,
+        ingredients,
+        instructions,
+        category,
+        area,
+    });
+    if (!updatedRecipe) {
+        return res.status(404).json({ message: "Recipe not found" });
+    }
+    res.status(200).json(updatedRecipe);
 };
 const addRecipe = (req, res) => {
     const { name, ingredients, instructions, category, area } = req.body;
@@ -73,7 +97,7 @@ exports.default = {
     getRecipes,
     getRecipeById,
     searchRecipe,
-    editRecipe,
+    editRecipe: [upload.single("thumbnail"), editRecipe],
     addRecipe: [upload.single("thumbnail"), addRecipe],
     deleteRecipe
 };

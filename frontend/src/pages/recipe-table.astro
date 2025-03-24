@@ -1,0 +1,248 @@
+---
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
+import AddRecipe from "../components/AddRecipe.astro";
+import Header from "../components/Header.astro";
+---
+
+<Layout>
+  <main class="hidden font-display">
+    <div class="container mx-[auto] w-11/12">
+      <Header />
+      <div class="home-body">
+        <form
+          method="get"
+          id="search-recipe"
+          class="w-full flex bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl pl-4 focus:ring-blue-500 focus:border-blue-500 p-2"
+        >
+          <input
+            class="w-full bg-gray-50 focus:outline-0"
+            type="text"
+            id="search-input"
+            autocomplete="off"
+            placeholder="Search for your recipe..."
+          />
+          <input
+            class="text-white hover:bg-blue-800 focus:outline-non font-medium rounded-xl text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700"
+            type="submit"
+            value="Search"
+          />
+        </form>
+        <h1 class="text-3xl font-bold w-3/4 py-3">My Recipes:</h1>
+        <div class="recipe-user-list rounded-md flex flex-col gap-5 p-1">
+          <div
+            id=""
+            class="recipe-user w-full md:min-w-[280px] flex flex-col gap-2 p-5 rounded-md outline-1 outline-gray-400"
+          >
+            <img class="w-full aspect-square rounded-md" src="" alt="" />
+            <h3></h3>
+            <div class="recipe-tags">
+              <span class="category"></span>
+              <span class="area"></span>
+            </div>
+            <div class="recipe-list-btns flex gap-2">
+              <a
+                href=""
+                class="w-full text-center text-white bg-blue-700 hover:bg-blue-800 focus:outline-non text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2"
+              >
+                Cook Now
+              </a>
+              <button
+                class="bg-gray-200 border border-gray-300 hover:bg-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          <div
+            class="recipe-user w-full md:min-w-[280px] flex flex-col gap-2 p-5 rounded-md outline-1"
+          >
+            <img class="w-full" src="https://placehold.co/150x100" alt="" />
+            <h3>Spice Grilled Chicken With Avocado Salsa</h3>
+            <div class="recipe-tags">
+              <span class="category">Category</span>
+              <span class="area">Area</span>
+            </div>
+            <div class="recipe-list-btns flex gap-2">
+              <button
+                class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:outline-non text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2"
+                >Cook Now</button
+              >
+              <button
+                class="bg-gray-200 border border-gray-300 hover:bg-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+                >Add to List</button
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <AddRecipe />
+</Layout>
+<script>
+  const content = document.querySelector("main") as HTMLElement;
+
+  const checkAuth = async () => {
+    const res = await fetch(`http://localhost:4500/users/check-auth`, {
+      method: "GET",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      alert("You have to be logged in to do that");
+      window.location.href = "/login";
+      return;
+    }
+    content.style.display = "block";
+  };
+
+  const searchForm = document.getElementById(
+    "search-recipe"
+  ) as HTMLFormElement;
+  searchForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const searchInput = document.getElementById(
+      "search-input"
+    ) as HTMLInputElement;
+    const query = searchInput.value;
+    renderSearch(query);
+  });
+
+  async function renderSearch(query: string) {
+    const res = await fetch(
+      `http://localhost:4500/recipes/search?name=${query}`
+    );
+    const recipes = await res.json();
+    console.log(recipes);
+
+    const recipeListContainer = document.querySelector(
+      ".recipe-user-list"
+    ) as HTMLDivElement;
+
+    recipeListContainer.innerHTML = "";
+
+    recipes.forEach((recipe: any) => {
+      const recipeElement = document.createElement("div");
+      recipeElement.id = recipe.id;
+      recipeElement.classList.add(
+        "recipe-user",
+        "w-full",
+        "md:min-w-[280px]",
+        "flex",
+        "flex-col",
+        "gap-2",
+        "p-5",
+        "rounded-md",
+        "outline-1",
+        "outline-gray-400"
+      );
+
+      recipeElement.innerHTML = `
+      <img class="w-full aspect-square rounded-md" src="http://localhost:4500${recipe.thumbnail}" alt="${recipe.name}" />
+      <h3>${recipe.name}</h3>
+      <div class="recipe-tags">
+        <span class="category">${recipe.category}</span>
+        <span class="area">${recipe.area}</span>
+      </div>
+      <div class="recipe-list-btns flex gap-2">
+        <a href="recipes/${recipe.id}" class="w-full text-center text-white bg-blue-700 hover:bg-blue-800 focus:outline-non text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2">
+          Cook Now
+        </a>
+        <button class="delete-btn bg-gray-200 border border-gray-300 hover:bg-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2">
+          Delete
+        </button>
+      </div>
+    `;
+
+      const deleteBtn = recipeElement.querySelector(
+        ".delete-btn"
+      ) as HTMLButtonElement;
+      deleteBtn.addEventListener("click", () => {
+        deleteRecipe(recipe.id);
+      });
+
+      recipeListContainer.appendChild(recipeElement);
+    });
+  }
+
+  async function getRecipes() {
+    const res = await fetch("http://localhost:4500/recipes");
+    const data = await res.json();
+    return data;
+  }
+
+  async function deleteRecipe(id: string) {
+    if (confirm("Are you sure you want to delete this recipe?")) {
+      const res = await fetch(`http://localhost:4500/recipes/${id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        alert("Failed to delete recipe.");
+        return;
+      }
+      window.location.href = "/recipe-table";
+      alert("Recipe deleted successfully!");
+    }
+  }
+
+  async function render() {
+    const recipes = await getRecipes();
+    const recipeListContainer = document.querySelector(
+      ".recipe-user-list"
+    ) as HTMLDivElement;
+
+    recipeListContainer.innerHTML = "";
+
+    recipes.forEach((recipe: any) => {
+      const recipeElement = document.createElement("div");
+      recipeElement.id = recipe.id;
+      recipeElement.classList.add(
+        "recipe-user",
+        "w-full",
+        "md:min-w-[280px]",
+        "md:flex-row",
+        "flex",
+        "flex-col",
+        "gap-2",
+        "p-5",
+        "rounded-md",
+        "outline-1",
+        "outline-gray-400"
+      );
+
+      recipeElement.innerHTML = `
+      <img class="w-full md:w-1/2 aspect-square rounded-md" src="http://localhost:4500${recipe.thumbnail}" alt="${recipe.name}" />
+      <div class="w-full h-full">
+      <h3 class="md:text-center font-semibold">${recipe.name}</h3>
+      <div class="recipe-tags">
+        <span class="category">${recipe.category}</span>
+        <span class="area">${recipe.area}</span>
+      </div>
+      <div class="recipe-list-btns mt-[auto] flex gap-2">
+        <a href="recipes/${recipe.id}" class="w-full text-center text-white bg-blue-700 hover:bg-blue-800 focus:outline-non text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2">
+          Cook Now
+        </a>
+        <button class="delete-btn bg-gray-200 border border-gray-300 hover:bg-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2">
+          Delete
+        </button>
+      </div>
+        </div>
+
+    `;
+
+      const deleteBtn = recipeElement.querySelector(
+        ".delete-btn"
+      ) as HTMLButtonElement;
+      deleteBtn?.addEventListener("click", () => {
+        deleteRecipe(recipe.id);
+      });
+
+      recipeListContainer.appendChild(recipeElement);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    checkAuth();
+    render();
+  });
+</script>

@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const storage: StorageEngine = multer.diskStorage({
     destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-        cb(null, "src/uploads/");
+        cb(null, "uploads/");
     },
     filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
         cb(null, uuidv4() + "-" + file.originalname); 
@@ -45,15 +45,45 @@ const searchRecipe = (req: Request<{}, {}, {}, { name: string }>, res: Response)
 }
 
 const editRecipe = (req: Request<{ id: string }, {}, Partial<Recipe>>, res: Response) => {
-    const { id } = req.params
-    const { name, thumbnail, ingredients, instructions, category, area } = req.body
-    const recipe = recipeModel.editRecipe(id, { name, thumbnail, ingredients, instructions, category, area })
-    if (!recipe) {
-        res.status(404).json({ message: 'Recipe not found' })
-        return
+    const { id } = req.params;
+    const { name, ingredients, instructions, category, area } = req.body;
+
+    const existingRecipe = recipeModel.readRecipe(id);
+    if (!existingRecipe) {
+        return res.status(404).json({ message: "Recipe not found" });
     }
-    res.status(200).json(recipe)
-}
+
+    let thumbnail = existingRecipe.thumbnail;
+    if (req.file) {
+        const fs = require("fs");
+        const path = require("path");
+
+        if (existingRecipe.thumbnail) {
+            const oldImagePath = path.join(__dirname, "..", existingRecipe.thumbnail);
+            fs.unlink(oldImagePath, (err: any) => {
+                if (err && err.code !== "ENOENT") {
+                    console.error("Error deleting old image:", err);
+                }
+            });
+        }
+        thumbnail = `/uploads/${req.file.filename}`;
+    }
+
+    const updatedRecipe = recipeModel.editRecipe(id, {
+        name,
+        thumbnail,
+        ingredients,
+        instructions,
+        category,
+        area,
+    });
+
+    if (!updatedRecipe) {
+        return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    res.status(200).json(updatedRecipe);
+};
 
 const addRecipe = (req: Request<{}, {}, Omit<Recipe, 'id'>>, res: Response) => {
     const { name, ingredients, instructions, category, area } = req.body
@@ -80,7 +110,7 @@ export default {
     getRecipes,
     getRecipeById,
     searchRecipe,
-    editRecipe,
+    editRecipe: [upload.single("thumbnail"), editRecipe],
     addRecipe: [upload.single("thumbnail"), addRecipe],
     deleteRecipe
 }

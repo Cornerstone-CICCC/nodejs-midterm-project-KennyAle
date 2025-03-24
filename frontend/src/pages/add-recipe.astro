@@ -4,14 +4,18 @@ import "../styles/global.css";
 ---
 
 <Layout>
-  <main class="login-bg">
+  <main class="hidden login-bg">
     <div
       class="mx-[auto] mt-3 min-h-dvh w-11/12 flex flex-col items-center justify-around"
     >
       <h1 class="text-center text-xl font-bold mb-4">
         What’s Cooking? Add Your Recipe!
       </h1>
-      <form id="form-add-recipe" class="w-full flex flex-col gap-3">
+      <form
+        id="form-add-recipe"
+        class="w-full flex flex-col gap-3"
+        enctype="multipart/form-data"
+      >
         <label for="name" class="block mb-2 text-sm font-medium text-gray-900"
           >Recipe Name:
           <input
@@ -25,42 +29,42 @@ import "../styles/global.css";
           /></label
         >
         <div id="ingredients-container" class="flex flex-col gap-2">
-          <label class="block mb-2 text-sm font-medium text-gray-900"
+          <label class="block text-sm font-medium text-gray-900"
             >Ingredients:
-            <!-- <input
-                type="text"
-                name="ingredient[]"
-                class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2"
-                placeholder="Enter ingredient"
-                autocomplete="off"
-                required
-              /> -->
-            <button
-              type="button"
-              id="add-ingredient"
-              class="w-full bg-gray-200 border border-gray-200 text-gray-900 text-sm rounded-lg block p-2.5 mt-2"
-              >Add Ingredient</button
-            >
           </label>
+          <input
+            type="text"
+            name="ingredients[]"
+            class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+            placeholder="Enter ingredient"
+            autocomplete="off"
+            required
+          />
+          <button
+            type="button"
+            id="add-ingredient"
+            class="w-full bg-gray-200 border border-gray-200 text-gray-900 text-sm rounded-lg block p-2.5"
+            >Add Ingredient</button
+          >
         </div>
         <div id="instructions-container" class="flex flex-col gap-2">
-          <label class="block mb-2 text-sm font-medium text-gray-900"
+          <label class="block text-sm font-medium text-gray-900"
             >Instructions:
-            <!-- <input
-                type="text"
-                name="instructions[]"
-                class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2"
-                placeholder="Enter instructions"
-                autocomplete="off"
-                required
-              /> -->
-            <button
-              type="button"
-              id="add-instruction"
-              class="w-full bg-gray-200 border border-gray-200 text-gray-900 text-sm rounded-lg block p-2.5 mt-2"
-              >Add Instruction</button
-            >
           </label>
+          <input
+            type="text"
+            name="instructions[]"
+            class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+            placeholder="Enter instructions"
+            autocomplete="off"
+            required
+          />
+          <button
+            type="button"
+            id="add-instruction"
+            class="w-full bg-gray-200 border border-gray-200 text-gray-900 text-sm rounded-lg block p-2.5"
+            >Add Instruction</button
+          >
         </div>
         <div class="add-recipe-middle flex w-full gap-2.5">
           <div class="drop-image w-full">
@@ -97,7 +101,12 @@ import "../styles/global.css";
                   SVG, PNG, JPG or GIF (MAX. 800x400px)
                 </p>
               </div>
-              <input id="dropzone-file" type="file" class="hidden" />
+              <input
+                id="dropzone-file"
+                name="thumbnail"
+                type="file"
+                class="hidden"
+              />
             </label>
           </div>
           <div class="names w-full flex flex-col">
@@ -116,12 +125,12 @@ import "../styles/global.css";
               /></label
             >
             <label
-              for="tag"
+              for="area"
               class="block mb-2 text-sm font-medium text-gray-900"
               >Tags:
               <input
                 type="text"
-                name="tag"
+                name="area"
                 id="tag"
                 class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
                 placeholder="Enter tag"
@@ -150,16 +159,34 @@ import "../styles/global.css";
 </Layout>
 
 <script>
+  const content = document.querySelector("main") as HTMLElement;
+
+  const checkAuth = async () => {
+    const res = await fetch(`http://localhost:4500/users/check-auth`, {
+      method: "GET",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      alert("You have to be logged in to do that");
+      window.location.href = "/login";
+      return;
+    }
+    content.style.display = "block";
+  };
+
   const dropImg = document.getElementById("dropzone-file") as HTMLInputElement;
   const dropzone = document.getElementById("dropzone") as HTMLLabelElement;
   const dropzoneText = document.getElementById(
     "dropzone-text"
   ) as HTMLDivElement;
   dropImg.addEventListener("change", () => {
-    const url = URL.createObjectURL(dropImg.files[0]);
-    dropzone.style.backgroundImage = `url("${url}")`;
-    dropzoneText.classList.add("hidden");
+    if (dropImg.files && dropImg.files.length > 0) {
+      const url = URL.createObjectURL(dropImg.files[0]);
+      dropzone.style.backgroundImage = `url("${url}")`;
+      dropzoneText.classList.add("hidden");
+    }
   });
+
   const addIngrBtn = document.getElementById(
     "add-ingredient"
   ) as HTMLButtonElement;
@@ -167,28 +194,37 @@ import "../styles/global.css";
     const container = document.getElementById(
       "ingredients-container"
     ) as HTMLDivElement;
+    const addButton = document.getElementById("add-ingredient");
+
     const newInput = document.createElement("div");
     newInput.classList.add("flex", "gap-2");
     newInput.innerHTML = `
-      <input
-        type="text"
-        name="ingredient[]"
-        class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-        placeholder="Enter ingredient"
-        autocomplete="off"
-        required
-      />
-      <button type="button" class="remove-ingredient p-2.5 bg-red-500 text-white rounded-lg">-</button>
-    `;
-    container.appendChild(newInput);
+    <input
+      type="text"
+      name="ingredients[]"
+      class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+      placeholder="Enter ingredient"
+      autocomplete="off"
+      required
+    />
+    <button type="button" class="remove-ingredient p-2.5 border border-red-500 text-red-500 bg-white rounded-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6m1-10V5a1 1 0 00-1-1h-4a1 1 0 00-1 1v2m-2 0h10" />
+      </svg>
+    </button>
+  `;
+
+    container.insertBefore(newInput, addButton);
   });
 
   const ingrContainer = document.getElementById(
     "ingredients-container"
   ) as HTMLDivElement;
   ingrContainer.addEventListener("click", (e) => {
-    if (e.target.classList.contains("remove-ingredient")) {
-      e.target.parentElement.remove();
+    const target = e.target as HTMLElement;
+    const removeBtn = target.closest(".remove-ingredient");
+    if (removeBtn) {
+      removeBtn.parentElement?.remove();
     }
   });
 
@@ -199,33 +235,53 @@ import "../styles/global.css";
     const container = document.getElementById(
       "instructions-container"
     ) as HTMLDivElement;
+    const addButton = document.getElementById("add-instruction");
+
     const newInput = document.createElement("div");
     newInput.classList.add("flex", "gap-2");
     newInput.innerHTML = `
-      <input
-        type="text"
-        name="instructions[]"
-        class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
-        placeholder="Enter instructions"
-        autocomplete="off"
-        required
-      />
-      <button type="button" class="remove-instruction p-2.5 bg-red-500 text-white rounded-lg">-</button>
-    `;
-    container.appendChild(newInput);
-  });
+    <input
+      type="text"
+      name="instructions[]"
+      class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+      placeholder="Enter instructions"
+      autocomplete="off"
+      required
+    />
+    <button type="button" class="remove-instruction p-2.5 border border-red-500 text-red-500 bg-white rounded-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6m1-10V5a1 1 0 00-1-1h-4a1 1 0 00-1 1v2m-2 0h10" />
+      </svg>
+    </button>
+  `;
 
+    container.insertBefore(newInput, addButton);
+  });
   const instContainer = document.getElementById(
     "instructions-container"
   ) as HTMLDivElement;
   instContainer.addEventListener("click", (e) => {
-    if (e.target.classList.contains("remove-instruction")) {
-      e.target.parentElement.remove();
+    const target = e.target as HTMLElement;
+    const removeBtn = target.closest(".remove-instruction");
+    if (removeBtn) {
+      removeBtn.parentElement?.remove();
     }
   });
-  const addForm = document.querySelector("#form-add-recipe");
-  addForm?.addEventListener("submit", (e) => {
+  const addForm = document.querySelector("#form-add-recipe") as HTMLFormElement;
+  addForm.addEventListener("submit", async (e) => {
     e.preventDefault();
-    
+    const formData = new FormData(addForm);
+    const res = await fetch(`http://localhost:4500/recipes`, {
+      method: "POST",
+      body: formData,
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      console.error(data.message);
+      return;
+    }
+    console.log(Object.fromEntries(formData.entries()));
+    window.location.href = "/recipe-table";
   });
+  checkAuth()
 </script>

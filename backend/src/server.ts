@@ -4,11 +4,13 @@ import cookieSession from 'cookie-session'
 import userRouter from './routes/user.routes'
 import recipeRouter from './routes/recipe.routes'
 import dotenv from 'dotenv'
+import path from 'path'
+import { checkLoggedIn } from './middleware/auth.middleware'
 dotenv.config()
 
 const app = express()
 
-app.use("src/uploads", express.static("uploads"))
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")))
 app.use(cors({
   origin: 'http://localhost:4321',
   credentials: true
