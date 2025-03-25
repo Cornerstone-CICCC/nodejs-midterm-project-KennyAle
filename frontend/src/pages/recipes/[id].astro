@@ -1,0 +1,533 @@
+---
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+import "../../styles/global.css";
+import AddRecipe from "../../components/AddRecipe.astro";
+import Header from "../../components/Header.astro";
+
+const { id } = Astro.params;
+
+let recipe = null;
+try {
+  const res = await fetch(`http://localhost:4500/recipes/${id}`);
+  if (res.ok) {
+    recipe = await res.json();
+  }
+} catch (error) {
+  console.error("Error fetching recipe:", error);
+}
+
+const formatIngredientName = (name: string) => {
+  return name
+    .replace(/\s*\d.*$/, "")
+    .trim()
+    .replace(/\s+/g, "");
+};
+---
+
+<Layout>
+  <main class="hidden font-display">
+    <div class="container mx-auto w-11/12">
+      <Header />
+      <dialog
+        id="editFormDialog"
+        class="backdrop:bg-black backdrop:opacity-50 w-11/12 h-4/5 overflow-auto fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 rounded-md"
+      >
+        <form
+          id="form-edit-recipe"
+          class="w-11/12 m-[auto] px-2 py-5 flex flex-col gap-3"
+          enctype="multipart/form-data"
+        >
+          <label for="name" class="block mb-2 text-sm font-medium text-gray-900"
+            >Recipe Name:
+            <input
+              type="text"
+              name="name"
+              id="name"
+              class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+              placeholder="Enter recipe name"
+              autocomplete="off"
+              required
+            /></label
+          >
+          <div id="ingredients-container" class="flex flex-col gap-2">
+            <label class="block text-sm font-medium text-gray-900"
+              >Ingredients:
+            </label>
+            <!-- <input
+              type="text"
+              name="ingredients[]"
+              class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+              placeholder="Enter ingredient"
+              autocomplete="off"
+              required
+            /> -->
+            <button
+              type="button"
+              id="add-ingredient"
+              class="w-full bg-gray-200 border border-gray-200 text-gray-900 text-sm rounded-lg block p-2.5"
+              >Add Ingredient</button
+            >
+          </div>
+          <div id="instructions-container" class="flex flex-col gap-2">
+            <label class="block text-sm font-medium text-gray-900"
+              >Instructions:
+            </label>
+            <!-- <input
+              type="text"
+              name="instructions[]"
+              class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+              placeholder="Enter instructions"
+              autocomplete="off"
+              required
+            /> -->
+            <button
+              type="button"
+              id="add-instruction"
+              class="w-full bg-gray-200 border border-gray-200 text-gray-900 text-sm rounded-lg block p-2.5"
+              >Add Instruction</button
+            >
+          </div>
+          <div class="add-recipe-middle flex w-full gap-2.5">
+            <div class="drop-image w-full">
+              <p class="block text-sm font-medium text-gray-900">
+                Upload Photo:
+              </p>
+              <label
+                for="dropzone-file"
+                id="dropzone"
+                class="mt-2 bg-center bg-contain bg-no-repeat flex flex-col items-center justify-center w-full h-40 rounded-lg cursor-pointer bg-gray-50 border border-gray-300 text-gray-900 hover:bg-gray-100"
+              >
+                <input
+                  id="dropzone-file"
+                  name="thumbnail"
+                  type="file"
+                  class="hidden"
+                />
+              </label>
+            </div>
+            <div class="names w-full flex flex-col">
+              <label
+                for="category"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Category:
+                <input
+                  type="text"
+                  name="category"
+                  id="category"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+                  placeholder="Enter category"
+                  autocomplete="off"
+                  required
+                /></label
+              >
+              <label
+                for="area"
+                class="block mb-2 text-sm font-medium text-gray-900"
+                >Tags:
+                <input
+                  type="text"
+                  name="area"
+                  id="tag"
+                  class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+                  placeholder="Enter tag"
+                  autocomplete="off"
+                  required
+                /></label
+              >
+            </div>
+          </div>
+
+          <div class="add-recipe-footer">
+            <button
+              type="submit"
+              class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:outline-non text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+              >Save Changes</button
+            >
+            <a
+              href=""
+              id="cancelBtn"
+              class="text-center bg-gray-200 border border-gray-300 hover:bg-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+              >Cancel</a
+            >
+          </div>
+        </form>
+      </dialog>
+      <div
+        class="home-body w-full flex flex-col md:flex-row gap-3.5 rounded-lg p-1"
+      >
+        {
+          recipe ? (
+            <>
+              <img
+                class="md:w-1/2 w-full rounded-lg"
+                src={"http://localhost:4500" + recipe.thumbnail}
+                alt={recipe.name}
+              />
+              <div class="flex flex-col gap-3 w-full recipe-text rounded-lg bg-gray-100 px-4 py-3">
+                <h1 class="text-center text-xl font-semibold">{recipe.name}</h1>
+
+                <div class="flex justify-between items-center">
+                  <h3 id="ingredients-tab" class="w-1/2 py-2 cursor-pointer">
+                    Ingredients List
+                  </h3>
+                  <h3
+                    id="instructions-tab"
+                    class="text-center w-1/2 text-blue-700 border border-gray-400 hover:bg-white focus:outline-none text-sm rounded-lg py-2 cursor-pointer"
+                  >
+                    Cooking Instructions
+                  </h3>
+                </div>
+
+                <ul id="ingredients-list" class="flex flex-col gap-2">
+                  {recipe.ingredients.map((item: any) => (
+                    <li class="border-2 border-gray-200 text-sm flex items-center gap-2 bg-white rounded-md p-2">
+                      <img
+                        class="p-2 rounded-lg w-8 h-8"
+                        src={
+                          "https://www.themealdb.com/images/ingredients/" +
+                          formatIngredientName(item) +
+                          "Small.png"
+                        }
+                        alt={item}
+                      />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+
+                <ul id="instructions-list" class="flex flex-col gap-2 hidden">
+                  {recipe.instructions.map((step: string, index: number) => (
+                    <li class="border-2 border-gray-200 text-sm bg-white rounded-md p-2">
+                      <strong>Step {index + 1}:</strong> {step}.
+                    </li>
+                  ))}
+                </ul>
+
+                <div class="w-full recipe-list-btns flex gap-2">
+                  <button
+                    id="editBtn"
+                    class="w-full text-white bg-blue-700 hover:bg-blue-800 text-sm rounded-lg p-2.5"
+                  >
+                    Edit Recipe
+                  </button>
+                  <button
+                    id="deleteBtn"
+                    class="bg-gray-200 border border-gray-300 hover:bg-gray-300 text-gray-900 text-sm rounded-lg w-full p-2.5"
+                  >
+                    Delete
+                  </button>
+                </div>
+                <a
+                  href="#"
+                  onclick="window.history.back(); return false;"
+                  class="w-full block text-center text-white bg-blue-700 hover:bg-blue-800 text-sm rounded-lg p-2.5"
+                >
+                  Go Back
+                </a>
+              </div>
+            </>
+          ) : (
+            <p class="text-center text-red-600">Recipe not found.</p>
+          )
+        }
+      </div>
+    </div>
+  </main>
+  <AddRecipe />
+</Layout>
+
+<script>
+  const content = document.querySelector("main") as HTMLElement;
+
+  const checkAuth = async () => {
+    const res = await fetch(`http://localhost:4500/users/check-auth`, {
+      method: "GET",
+      credentials: "include",
+    });
+    if (!res.ok) {
+      alert("You have to be logged in to do that");
+      window.location.href = "/login";
+      return;
+    }
+    content.style.display = "block";
+  };
+  checkAuth();
+  const ingredientsTab = document.getElementById("ingredients-tab");
+  const instructionsTab = document.getElementById("instructions-tab");
+  const ingredientsList = document.getElementById(
+    "ingredients-list"
+  ) as HTMLUListElement;
+  const instructionsList = document.getElementById(
+    "instructions-list"
+  ) as HTMLUListElement;
+
+  if (ingredientsTab && instructionsTab) {
+    ingredientsTab.addEventListener("click", () => {
+      ingredientsList.classList.remove("hidden");
+      instructionsList.classList.add("hidden");
+    });
+
+    instructionsTab.addEventListener("click", () => {
+      instructionsList.classList.remove("hidden");
+      ingredientsList.classList.add("hidden");
+    });
+  }
+
+  const deleteBtn = document.getElementById("deleteBtn") as HTMLButtonElement;
+  if (deleteBtn) {
+    deleteBtn.addEventListener("click", async () => {
+      if (confirm("Are you sure you want to delete this recipe?")) {
+        const id = window.location.pathname.split("/").pop();
+        const res = await fetch(`http://localhost:4500/recipes/${id}`, {
+          method: "DELETE",
+        });
+
+        if (!res.ok) {
+          alert("Failed to delete recipe.");
+          return;
+        }
+        window.location.href = "/recipe-table";
+      }
+    });
+  }
+  const editBtn = document.getElementById("editBtn") as HTMLButtonElement;
+  const cancelBtn = document.getElementById("cancelBtn") as HTMLButtonElement;
+  const editFormDialog = document.getElementById(
+    "editFormDialog"
+  ) as HTMLDialogElement;
+  const form = document.getElementById("form-edit-recipe") as HTMLFormElement;
+
+  editBtn.addEventListener("click", async () => {
+    const id = window.location.pathname.split("/").pop();
+    const res = await fetch(`http://localhost:4500/recipes/${id}`);
+
+    if (!res.ok) {
+      alert("Failed to get recipe.");
+      return;
+    }
+
+    const data = await res.json();
+
+    form.name.value = data.name;
+    form.category.value = data.category;
+    form.area.value = data.area;
+
+    const dropImg = document.getElementById(
+      "dropzone-file"
+    ) as HTMLInputElement;
+    const dropzone = document.getElementById("dropzone") as HTMLLabelElement;
+    if (dropzone) {
+      dropzone.style.backgroundImage = `url(http://localhost:4500${data.thumbnail})`;
+      dropzone.style.backgroundSize = "cover";
+      dropzone.style.backgroundPosition = "center";
+    }
+    dropImg.addEventListener("change", () => {
+      if (dropImg.files && dropImg.files.length > 0) {
+        const url = URL.createObjectURL(dropImg.files[0]);
+        dropzone.style.backgroundImage = `url("${url}")`;
+      }
+    });
+
+    const ingredientsContainer = document.getElementById(
+      "ingredients-container"
+    ) as HTMLDivElement;
+    ingredientsContainer.innerHTML = `
+    <label class="block text-sm font-medium text-gray-900"
+              >Ingredients:
+            </label>
+    `;
+
+    const instructionsContainer = document.getElementById(
+      "instructions-container"
+    ) as HTMLDivElement;
+    instructionsContainer.innerHTML = `
+    <label class="block text-sm font-medium text-gray-900"
+              >Instructions:
+            </label>
+    `;
+
+    const addIngredientButton = document.createElement("button");
+    addIngredientButton.type = "button";
+    addIngredientButton.id = "add-ingredient";
+    addIngredientButton.className =
+      "w-full bg-gray-200 border border-gray-200 text-gray-900 text-sm rounded-lg block p-2.5";
+    addIngredientButton.textContent = "Add Ingredient";
+    ingredientsContainer.appendChild(addIngredientButton);
+    addIngredientButton.addEventListener("click", () => {
+      const container = document.getElementById(
+        "ingredients-container"
+      ) as HTMLDivElement;
+      const addButton = document.getElementById("add-ingredient");
+
+      const newInput = document.createElement("div");
+      newInput.classList.add("flex", "gap-2");
+      newInput.innerHTML = `
+    <input
+      type="text"
+      name="ingredients[]"
+      class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+      placeholder="Enter ingredient"
+      autocomplete="off"
+      required
+    />
+    <button type="button" class="remove-ingredient p-2.5 border border-red-500 text-red-500 bg-white rounded-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6m1-10V5a1 1 0 00-1-1h-4a1 1 0 00-1 1v2m-2 0h10" />
+      </svg>
+    </button>
+  `;
+
+      container.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const removeBtn = target.closest(".remove-ingredient");
+        if (removeBtn) {
+          removeBtn.parentElement?.remove();
+        }
+      });
+
+      container.insertBefore(newInput, addButton);
+    });
+
+    const addInstructionButton = document.createElement("button");
+    addInstructionButton.type = "button";
+    addInstructionButton.id = "add-instruction";
+    addInstructionButton.className =
+      "w-full bg-gray-200 border border-gray-200 text-gray-900 text-sm rounded-lg block p-2.5";
+    addInstructionButton.textContent = "Add Instruction";
+    instructionsContainer.appendChild(addInstructionButton);
+    addInstructionButton.addEventListener("click", () => {
+      const container = document.getElementById(
+        "instructions-container"
+      ) as HTMLDivElement;
+      const addButton = document.getElementById("add-instruction");
+
+      const newInput = document.createElement("div");
+      newInput.classList.add("flex", "gap-2");
+      newInput.innerHTML = `
+    <input
+      type="text"
+      name="instructions[]"
+      class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+      placeholder="Enter instructions"
+      autocomplete="off"
+      required
+    />
+    <button type="button" class="remove-instruction p-2.5 border border-red-500 text-red-500 bg-white rounded-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6m1-10V5a1 1 0 00-1-1h-4a1 1 0 00-1 1v2m-2 0h10" />
+      </svg>
+    </button>
+  `;
+
+      container.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const removeBtn = target.closest(".remove-instruction");
+        if (removeBtn) {
+          removeBtn.parentElement?.remove();
+        }
+      });
+      container.insertBefore(newInput, addButton);
+    });
+
+    data.ingredients.forEach((ingredient: any) => {
+      const newInput = document.createElement("div");
+      newInput.classList.add("flex", "gap-2");
+      newInput.innerHTML = `
+    <input
+      type="text"
+      name="ingredients[]"
+      class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+      placeholder="Enter ingredient"
+      autocomplete="off"
+      required
+    />
+    <button type="button" class="remove-ingredient p-2.5 border border-red-500 text-red-500 bg-white rounded-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6m1-10V5a1 1 0 00-1-1h-4a1 1 0 00-1 1v2m-2 0h10" />
+      </svg>
+    </button>
+  `;
+      const ingredientInput = newInput.querySelector(
+        "input"
+      ) as HTMLInputElement;
+      ingredientInput.type = "text";
+      ingredientInput.name = "ingredients[]";
+      ingredientInput.value = ingredient;
+      ingredientInput.className =
+        "w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5";
+      ingredientsContainer.insertBefore(newInput, addIngredientButton);
+      newInput.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const removeBtn = target.closest(".remove-ingredient");
+        if (removeBtn) {
+          removeBtn.parentElement?.remove();
+        }
+      });
+    });
+
+    data.instructions.forEach((instruction: any) => {
+      const newInput = document.createElement("div");
+      newInput.classList.add("flex", "gap-2");
+      newInput.innerHTML = `
+    <input
+      type="text"
+      name="instructions[]"
+      class="w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5"
+      placeholder="Enter ingredient"
+      autocomplete="off"
+      required
+    />
+    <button type="button" class="remove-ingredient p-2.5 border border-red-500 text-red-500 bg-white rounded-lg flex items-center justify-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M19 7l-1 12a2 2 0 01-2 2H8a2 2 0 01-2-2L5 7m5 4v6m4-6v6m1-10V5a1 1 0 00-1-1h-4a1 1 0 00-1 1v2m-2 0h10" />
+      </svg>
+    </button>
+  `;
+      const instructionInput = newInput.querySelector(
+        "input"
+      ) as HTMLInputElement;
+      instructionInput.type = "text";
+      instructionInput.name = "instructions[]";
+      instructionInput.value = instruction;
+      instructionInput.className =
+        "w-full bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5";
+      instructionsContainer.insertBefore(newInput, addInstructionButton);
+      newInput.addEventListener("click", (e) => {
+        const target = e.target as HTMLElement;
+        const removeBtn = target.closest(".remove-ingredient");
+        if (removeBtn) {
+          removeBtn.parentElement?.remove();
+        }
+      });
+    });
+
+    editFormDialog.showModal();
+  });
+
+  cancelBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    editFormDialog.close();
+  });
+
+  const editForm = document.querySelector(
+    "#form-edit-recipe"
+  ) as HTMLFormElement;
+  editForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const id = window.location.pathname.split("/").pop();
+    const formData = new FormData(editForm);
+    const res = await fetch(`http://localhost:4500/recipes/${id}`, {
+      method: "PUT",
+      body: formData,
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      console.error(data.message);
+      return;
+    }
+    console.log(Object.fromEntries(formData.entries()));
+    window.location.reload();
+  });
+</script>

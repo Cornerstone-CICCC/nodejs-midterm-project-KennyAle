@@ -1,0 +1,40 @@
+---
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
+import Header from "../components/Header.astro";
+---
+
+<Layout>
+  <Header/>
+  <div class="profile" style="display: none;">
+    <h1>User Profile</h1>
+    <ul>
+      <li>Username: <span id="username"></span></li>
+      <li>First Name: <span id="firstname"></span></li>
+      <li>Last Name: <span id="lastname"></span></li>
+    </ul>
+    <a href="/logout">Log Out</a>
+  </div>
+</Layout>
+
+<script>
+  const profile = document.querySelector('.profile') as HTMLDivElement
+
+  const checkAuth = async () => {
+    const res = await fetch(`http://localhost:4500/users/check-auth`, {
+      method: "GET",
+      credentials: "include"
+    })
+    if (!res.ok) {
+      window.location.href = "/login"
+      return
+    }
+    const data = await res.json()
+    profile.style.display = "block";
+    (profile.querySelector('#username') as HTMLSpanElement).innerHTML = data.username;
+    (profile.querySelector('#firstname') as HTMLSpanElement).innerHTML = data.firstname;
+    (profile.querySelector('#lastname') as HTMLSpanElement).innerHTML = data.lastname;
+  }
+
+  checkAuth()
+</script>

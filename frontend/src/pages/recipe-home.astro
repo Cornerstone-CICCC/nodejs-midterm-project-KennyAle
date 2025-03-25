@@ -1,0 +1,183 @@
+---
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
+import AddRecipe from "../components/AddRecipe.astro";
+import Header from "../components/Header.astro";
+---
+
+<Layout>
+  <main class="hidden font-display">
+    <div class="container mx-[auto] w-11/12">
+      <Header/>
+      <div class="home-body">
+        <h1 class="text-3xl font-bold w-3/4 mb-3">
+          What's On Your Plate Today?
+        </h1>
+        <form
+          method="get"
+          id="search-recipe"
+          class="w-full flex bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl pl-4 focus:ring-blue-500 focus:border-blue-500 p-2"
+        >
+          <input
+            class="w-full bg-gray-50 focus:outline-0"
+            type="text"
+            id="search-input"
+            autocomplete="off"
+            placeholder="Describe what you're craving..."
+          />
+          <input
+            class="text-white hover:bg-blue-800 focus:outline-non font-medium rounded-xl text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700"
+            type="submit"
+            value="Search"
+          />
+        </form>
+        <div
+          class="hidden recipe-results flex-col gap-3 rounded-lg bg-white my-3"
+        >
+          <h3 class="w-1/2">Results:</h3>
+          <ul class="recipe-results-list flex flex-col gap-2">
+            <li
+              class="text-sm flex items-center gap-3 bg-gray-100 rounded-md px-3 py-1"
+            >
+              <img
+                class="py-2 rounded-xl"
+                src="https://placehold.co/60x60"
+                alt=""
+              />
+              <div class="recipe-list-text flex flex-col mr-[auto] gap-1">
+                <p class="font-semibold">Fried Chicken</p>
+                <span class="flex gap-3">
+                  <p class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">Category</p>
+                  <p class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">Area</p>
+                </span>
+              </div>
+              <button
+                class="justify-self-end text-center w-1/4 text-blue-700 bg-white hover:bg-white focus:outline-non text-sm rounded-lg py-2"
+              >
+                See Recipe
+              </button>
+            </li>
+          </ul>
+        </div>
+        <h2 class="py-3">Your Recipes:</h2>
+        <div
+          class="recipe-user-list overflow-x-scroll rounded-md flex gap-5 p-1"
+        >
+        </div>
+      </div>
+    </div>
+  </main>
+  <AddRecipe />
+</Layout>
+
+<script>
+  const content = document.querySelector('main') as HTMLElement
+
+  const checkAuth = async () => {
+    const res = await fetch(`http://localhost:4500/users/check-auth`, {
+      method: "GET",
+      credentials: "include"
+    })
+    if (!res.ok) {
+      alert('You have to be logged in to do that')
+      window.location.href = "/login"
+      return
+    }
+    content.style.display = "block";
+  }
+  const searchForm = document.getElementById(
+    "search-recipe"
+  ) as HTMLFormElement;
+  searchForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const searchInput = document.getElementById(
+      "search-input"
+    ) as HTMLInputElement;
+    const query = searchInput.value;
+    renderSearch(query);
+  });
+
+  async function getRecipes() {
+    const res = await fetch("http://localhost:4500/recipes");
+    const data = await res.json();
+    return data;
+  }
+
+  const renderMyRecipes = async () => {
+    const data = await getRecipes();
+    console.log(data);
+
+    const recipeList = document.querySelector(
+      ".recipe-user-list"
+    ) as HTMLDivElement;
+    data.forEach((recipe) => {
+      recipeList.innerHTML += `
+      <div
+            class="recipe-user min-w-[280px] w-[280px] flex flex-col gap-2 p-5 rounded-md outline-1"
+          >
+            <img class="w-full aspect-square object-cover rounded-md" src="http://localhost:4500${recipe.thumbnail}" alt="${recipe.name}" />
+            <h3 class="md:text-center font-semibold">${recipe.name}</h3>
+            <div class="recipe-tags">
+              <span class="category bg-blue-500 text-white text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm bg-blue-100 text-white text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">${recipe.category}</span>
+        <span class="area bg-green-500 text-white text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm bg-blue-100 text-white text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">${recipe.area}</span>
+            </div>
+            <div class="recipe-list-btns flex gap-2">
+              <a href="recipes/${recipe.id}"
+                class="w-1/2 ml-[auto] text-center text-white bg-blue-700 hover:bg-blue-800 focus:outline-non text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2.5 mt-2"
+                >Cook Now</a
+              >
+            </div>
+          </div>
+      `;
+    });
+  };
+  getRecipes();
+
+  const renderSearch = async (query: string) => {
+    const res = await fetch(
+      `https://www.themealdb.com/api/json/v1/1/search.php?s=${query}`
+    );
+    const data = await res.json();
+    console.log(data);
+    const searchContainer = document.querySelector(
+      ".recipe-results"
+    ) as HTMLDivElement;
+    const listContainer = searchContainer.querySelector(
+      ".recipe-results-list"
+    ) as HTMLUListElement;
+    listContainer.innerHTML = "";
+    searchContainer.classList.remove("hidden");
+    searchContainer.classList.add("flex");
+    data.meals.forEach((recipe: any) => {
+      const listItem = document.createElement("li");
+      listItem.innerHTML = `
+      <li
+              class="text-sm flex items-center gap-3 bg-gray-100 rounded-md px-3 py-1"
+            >
+              <img
+                class="object-cover py-2 rounded-xl w-[60px] h-[60px]"
+                src="${recipe.strMealThumb}"
+                alt=""
+              />
+              <div class="recipe-list-text flex flex-col mr-[auto] gap-1">
+                <p class="font-semibold">${recipe.strMeal}</p>
+                <span class="flex gap-3">
+                  <p>${recipe.strArea}</p>
+                  <span>-</span>
+                  <p>${recipe.strCategory}</p>
+                </span>
+              </div>
+              <a href="/results/${recipe.idMeal}"
+                class="justify-self-end text-center w-1/4 text-blue-700 bg-white hover:bg-white focus:outline-non text-sm rounded-lg py-2"
+              >
+                See Recipe
+              </a>
+            </li>
+      `;
+      listContainer.appendChild(listItem);
+      console.log(recipe);
+    });
+  };
+  checkAuth()
+  renderMyRecipes();
+</script>

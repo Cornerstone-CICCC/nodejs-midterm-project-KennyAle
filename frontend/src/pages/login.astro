@@ -1,0 +1,78 @@
+---
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
+---
+
+<Layout>
+  <main class="login-bg">
+    <div
+      class="mx-[auto] min-h-dvh w-11/12 flex flex-col items-center justify-around"
+    >
+      <h1 class="text-center text-xl font-bold">
+        Welcome Back! Log in to Your Recipe Book
+      </h1>
+      <form id="form-login" class="w-full flex flex-col gap-5">
+        <label
+          for="username"
+          class="block mb-2 text-sm font-medium text-gray-900"
+          >Username:
+          <input
+            type="text"
+            name="username"
+            id="username"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+            placeholder="Enter your username"
+            autocomplete="off"
+            required
+          /></label
+        >
+        <label
+          for="password"
+          class="block mb-2 text-sm font-medium text-gray-900"
+          >Password:
+          <input
+            type="password"
+            name="password"
+            id="password"
+            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 mt-2"
+            placeholder="Enter your password"
+            autocomplete="off"
+            required
+          /></label
+        >
+        <button
+          class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:outline-non font-medium rounded-md text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          >Log In</button
+        >
+        <p class="text-center">
+          Don't have an account? <a href="/register" class="underline"
+            >Sign Up</a>
+        </p>
+      </form>
+    </div>
+  </main>
+</Layout>
+
+<script>
+  const form = document.querySelector("#form-login") as HTMLFormElement;
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const formObj = Object.fromEntries(formData.entries()); // Converts form data to JS object
+    const res = await fetch(`http://localhost:4500/users/login`, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formObj),
+    });
+    if (!res.ok) {
+      console.error("Login details are incorrect");
+      return;
+    }
+    window.location.href = "/recipe-home";
+  });
+</script>

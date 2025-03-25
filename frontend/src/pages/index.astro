@@ -1,0 +1,41 @@
+---
+import Layout from "../layouts/Layout.astro";
+import "../styles/global.css";
+---
+
+<Layout>
+  <main class="login-bg h-dvh">
+    <div class="w-full flex flex-col items-center justify-center min-h-[75dvh]">
+      <img
+        class="opacity-80 rounded-md shadow-[-10px_-10px_30px_4px_rgba(0,0,0,0.1),_10px_10px_30px_4px_rgba(45,78,255,0.15)] w-[150px] h-[200px] object-cover rotate-25 absolute top-10 left-20"
+        src="https://www.themealdb.com/images/media/meals/xxrxux1503070723.jpg"
+        alt=""
+      />
+      <img
+        class="opacity-90 rounded-md shadow-[-10px_-10px_30px_4px_rgba(0,0,0,0.1),_10px_10px_30px_4px_rgba(45,78,255,0.15)] w-[150px] h-[200px] object-cover rotate-355 absolute"
+        src="https://www.themealdb.com/images/media/meals/wyxwsp1486979827.jpg"
+        alt=""
+      />
+      <img
+        class="rounded-md shadow-[-10px_-10px_30px_4px_rgba(0,0,0,0.1),_10px_10px_30px_4px_rgba(45,78,255,0.15)] w-[150px] h-[200px] object-cover rotate-15 absolute top-30 right-20"
+        src="https://www.themealdb.com/images/media/meals/ustsqw1468250014.jpg"
+        alt=""
+      />
+    </div>
+    <div class="text flex flex-col gap-6 mx-5">
+      <h1 class="text-center text-xl font-bold">
+        Smart Recipes, Just For You!
+      </h1>
+      <div class="buttons flex">
+        <a
+          class="w-full text-white bg-blue-700 hover:bg-blue-800 focus:outline-non font-medium rounded-md text-sm px-5 py-2.5 text-center me-2 mb-2 dark:bg-blue-600 dark:hover:bg-blue-700"
+          href="/login">Login</a
+        >
+        <a
+          class="w-full bg-white hover:bg-gray-200 focus:outline-non font-medium rounded-md text-sm px-5 py-2.5 text-center me-2 mb-2"
+          href="/register">Sign up</a
+        >
+      </div>
+    </div>
+  </main>
+</Layout>
