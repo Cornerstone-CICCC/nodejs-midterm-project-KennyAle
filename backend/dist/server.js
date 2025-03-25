@@ -14,7 +14,7 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 app.use("/uploads", express_1.default.static(path_1.default.join(__dirname, "../uploads")));
 app.use((0, cors_1.default)({
-    origin: 'http://localhost:4321',
+    origin: 'http://localhost:4322',
     credentials: true
 }));
 const SIGN_KEY = process.env.COOKIE_SIGN_KEY;
@@ -24,8 +24,8 @@ if (!SIGN_KEY || !ENCRYPT_KEY) {
 }
 app.use((0, cookie_session_1.default)({
     name: 'session',
-    keys: [SIGN_KEY, ENCRYPT_KEY],
-    maxAge: 5 * 60 * 1000
+    keys: [SIGN_KEY, ENCRYPT_KEY]
+    // maxAge: 5 * 60 * 1000
 }));
 app.use(express_1.default.json());
 app.use('/users', user_routes_1.default);

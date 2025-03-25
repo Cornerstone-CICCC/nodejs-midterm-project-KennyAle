@@ -1,5 +1,5 @@
 <div class="header flex justify-between items-center py-2">
-  <h2 class="opacity-50 font-semibold"></h2>
+  <a href="/recipe-home"><h2 class="opacity-50 font-semibold"></h2></a>
   <div class="header-btns flex gap-3">
     <a href="/profile" class="p-2 rounded-full outline-1 outline-gray-300/60">
       <svg
@@ -53,5 +53,5 @@
     credentials: "include",
   });
   const user = await res.json();
-  welcome.innerHTML = `Hello, ${user.username}!`;
+  welcome.innerHTML = `Hello, ${user.firstname}!`;
 </script>

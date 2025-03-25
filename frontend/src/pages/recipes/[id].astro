@@ -22,7 +22,7 @@ const formatIngredientName = (name: string) => {
   return name
     .replace(/\s*\d.*$/, "")
     .trim()
-    .replace(/\s+/g, "-");
+    .replace(/\s+/g, "");
 };
 ---
 
@@ -188,7 +188,7 @@ const formatIngredientName = (name: string) => {
                         src={
                           "https://www.themealdb.com/images/ingredients/" +
                           formatIngredientName(item) +
-                          "-Small.png"
+                          "Small.png"
                         }
                         alt={item}
                       />

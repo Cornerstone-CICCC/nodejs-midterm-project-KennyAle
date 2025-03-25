@@ -47,8 +47,8 @@ import Header from "../components/Header.astro";
               <div class="recipe-list-text flex flex-col mr-[auto] gap-1">
                 <p class="font-semibold">Fried Chicken</p>
                 <span class="flex gap-3">
-                  <p>Category</p>
-                  <p>Area</p>
+                  <p class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">Category</p>
+                  <p class="bg-blue-100 text-blue-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm dark:bg-blue-900 dark:text-blue-300">Area</p>
                 </span>
               </div>
               <button
@@ -116,10 +116,10 @@ import Header from "../components/Header.astro";
             class="recipe-user min-w-[280px] w-[280px] flex flex-col gap-2 p-5 rounded-md outline-1"
           >
             <img class="w-full aspect-square object-cover rounded-md" src="http://localhost:4500${recipe.thumbnail}" alt="${recipe.name}" />
-            <h3>${recipe.name}</h3>
+            <h3 class="md:text-center font-semibold">${recipe.name}</h3>
             <div class="recipe-tags">
-              <span class="category">${recipe.category}</span>
-              <span class="area">${recipe.area}</span>
+              <span class="category bg-blue-500 text-white text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm bg-blue-100 text-white text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">${recipe.category}</span>
+        <span class="area bg-green-500 text-white text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm bg-blue-100 text-white text-xs font-medium me-2 px-2.5 py-0.5 rounded-sm">${recipe.area}</span>
             </div>
             <div class="recipe-list-btns flex gap-2">
               <a href="recipes/${recipe.id}"
